@@ -38,4 +38,12 @@ Se detectaron registros con eficiencias superiores al 100 %, principalmente a ba
 
 *Proyecto de Análisis de Datos aplicado a sistemas SCADA de generación eólica.*
 
-![Dashboard de Gráficos SCADA](dashboard_graficos.png)
+## 📷 Visualizaciones
+
+### Dashboard 1
+
+![Dashboard SCADA 1](01_dashboard_graficos.png)
+
+### Dashboard 2
+
+![Dashboard SCADA 2](02_dashboard_graficos.png)
