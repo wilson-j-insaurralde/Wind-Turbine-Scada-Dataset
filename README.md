@@ -20,3 +20,5 @@ Análisis de datos (ETL, EDA y Visualización) sobre +50.000 registros SCADA de 
 
 ---
 *Proyecto de Análisis de Datos / Ingeniería SCADA.*
+
+![Dashboard de Gráficos SCADA](dashboard_graficos.png)
