@@ -109,11 +109,11 @@ Por ello, estos registros deben interpretarse como valores atípicos propios de 
 
 ### **Dashboard 1**
 
-\!\[Dashboard 1\](dashboard/images/01_dashboard_graficos.png)
+![Dashboard 1](dashboard/images/01_dashboard_graficos.png)
 
 ### **Dashboard 2**
 
-\!\[Dashboard 2\](dashboard/images/02_dashboard_graficos.png)
+![Dashboard 2](dashboard/images/02_dashboard_graficos.png)
 
 ## ---
 
