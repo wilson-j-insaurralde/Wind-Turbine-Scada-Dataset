@@ -1,0 +1,66 @@
+=========================================================
+                WIND TURBINE SCADA DATASET
+=========================================================
+
+Fuente:
+https://www.kaggle.com/datasets/berkerisen/wind-turbine-scada-dataset
+
+Autor:
+Berker Isen
+
+---------------------------------------------------------
+DESCRIPCIÓN
+---------------------------------------------------------
+
+Este conjunto de datos proviene del sistema SCADA de una
+turbina eólica en funcionamiento ubicada en Turquía.
+
+El sistema SCADA registra información operacional de la
+turbina cada 10 minutos, permitiendo analizar el
+comportamiento del aerogenerador y comparar la producción
+real con la producción teórica.
+
+---------------------------------------------------------
+ARCHIVO ORIGINAL
+---------------------------------------------------------
+
+T1.csv
+
+---------------------------------------------------------
+VARIABLES DEL DATASET
+---------------------------------------------------------
+
+• Date/Time
+  Fecha y hora del registro (intervalos de 10 minutos).
+
+• LV ActivePower (kW)
+  Potencia eléctrica generada por la turbina en ese
+  instante.
+
+• Wind Speed (m/s)
+  Velocidad del viento a la altura del buje de la
+  turbina.
+
+• Theoretical_Power_Curve (KWh)
+  Potencia teórica que debería generar la turbina para
+  esa velocidad de viento, según el fabricante.
+
+• Wind Direction (°)
+  Dirección del viento medida a la altura del buje.
+  La turbina se orienta automáticamente hacia esta
+  dirección.
+
+---------------------------------------------------------
+NOTAS
+---------------------------------------------------------
+
+- El archivo original (T1.csv) se conserva sin modificar
+  en la carpeta:
+
+      data/raw/
+
+- El archivo procesado generado durante el análisis se
+  guarda en:
+
+      data/processed/
+
