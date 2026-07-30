@@ -19,6 +19,10 @@ NOTEBOOKS_DIR = BASE_DIR / "notebooks"
 RAW_CSV_PATH = RAW_DIR / "T1.csv"
 PROCESSED_CSV_PATH = PROCESSED_DIR / "datos_turbina_procesados.csv"
 
+# Configuración de la interfaz gráfica (Tkinter)
+APP_TITLE = "Wind Turbine SCADA Performance Analyzer"
+APP_GEOMETRY = "1000x600"
+
 #print("--- VERIFICACIÓN DE RUTAS ---")
 #print("1. Raíz del proyecto:", BASE_DIR)
 #print("2. Archivo CSV a buscar:", RAW_CSV_PATH)
