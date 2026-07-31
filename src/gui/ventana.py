@@ -10,12 +10,14 @@ sys.path.append(str(RAIZ))
 
 from src.config import APP_GEOMETRY, APP_TITLE
 
+
 class VentanaPrincipal:
 
     def __init__(self, root):
         self.root = root
         self.root.title(APP_TITLE)
         self.root.geometry(APP_GEOMETRY)
+
         # --- BARRA DE ESTADO (PIE DE PÁGINA) ---
         self.barra_estado = ttk.Label(
             self.root,
@@ -31,12 +33,12 @@ class VentanaPrincipal:
         self.panel_lateral = ttk.Frame(self.root, padding=10)
         self.panel_lateral.pack(side="left", fill="y")
 
-        # Título 
+        # Título
         ttk.Label(
             self.panel_lateral, text="Panel de Control", font=("Arial", 12, "bold")
         ).pack(pady=10)
-# --- BOTONES DEL PANEL DE CONTROL ---
 
+        # --- BOTONES DEL PANEL DE CONTROL ---
         # 1. Cargar CSV
         self.btn_cargar = tk.Button(
             self.panel_lateral,
@@ -83,7 +85,7 @@ class VentanaPrincipal:
 
         # 5. Exportar CSV
         self.btn_exportar_csv = tk.Button(
-           self.panel_lateral,
+            self.panel_lateral,
             text="💾 Exportar CSV",
             command=self.accion_exportar_csv,
             width=18,
@@ -111,48 +113,76 @@ class VentanaPrincipal:
 
         self.lbl_estado = ttk.Label(
             self.area_principal,
-            text="Bienvenido. Hacé clic en 'Cargar CSV' para empezar.",
+            text="Bienvenido. Hacé clic en 'Abrir CSV' para empezar.",
             font=("Arial", 11),
         )
         self.lbl_estado.pack(pady=20)
 
-    # --- ACCIONES TEMPORALES PARA PROBAR ---
+    def mostrar_tabla(self, df):
+        """Limpia el área principal y dibuja una tabla (Treeview) con los datos del DataFrame."""
+        # 1. Limpiamos cualquier etiqueta o tabla vieja del área blanca
+        for widget in self.area_principal.winfo_children():
+            widget.destroy()
+
+        # 2. Creamos un marco para la tabla y sus barras de desplazamiento (scroll)
+        frame_tabla = ttk.Frame(self.area_principal)
+        frame_tabla.pack(fill="both", expand=True)
+
+        scroll_y = ttk.Scrollbar(frame_tabla, orient="vertical")
+        scroll_x = ttk.Scrollbar(frame_tabla, orient="horizontal")
+
+        # 3. Creamos el componente Treeview
+        tabla = ttk.Treeview(
+            frame_tabla,
+            columns=list(df.columns),
+            show="headings",
+            yscrollcommand=scroll_y.set,
+            xscrollcommand=scroll_x.set,
+        )
+
+        scroll_y.config(command=tabla.yview)
+        scroll_x.config(command=tabla.xview)
+
+        scroll_y.pack(side="right", fill="y")
+        scroll_x.pack(side="bottom", fill="x")
+        tabla.pack(fill="both", expand=True)
+
+        # 4. Ponemos los nombres de las columnas
+        for col in df.columns:
+            tabla.heading(col, text=col)
+            tabla.column(col, width=120, anchor="center")
+
+        # 5. Cargar las primeras 100 filas del dataset
+        for _, fila in df.head(100).iterrows():
+            tabla.insert("", "end", values=list(fila))
+
+    # --- ACCIONES ---
     def accion_cargar(self):
-        # Llamamos a la función que armamos recién en cargar_csv.py
+        # Llamamos a la función que armamos en cargar_csv.py
         df, mensaje = seleccionar_y_cargar_csv()
 
         if df is not None:
             self.df_actual = df  # Guardamos el DataFrame en la ventana
-            # Mostramos en la pantalla el mensaje con la cantidad de filas y columnas
-            self.lbl_estado.config(
+            # Actualizamos la barra de estado de abajo
+            self.barra_estado.config(
                 text=f"✅ {mensaje} | Filas: {len(df)} | Columnas: {len(df.columns)}"
             )
+            # Dibujamos la tabla en la pantalla principal
+            self.mostrar_tabla(df)
         else:
-            self.lbl_estado.config(text=f"⚠️ {mensaje}")
+            self.barra_estado.config(text=f"⚠️ {mensaje}")
 
     def accion_limpiar(self):
-        self.lbl_estado.config(
-            text="Botón Limpiar Datos presionado"
-        )
+        self.lbl_estado.config(text="Botón Limpiar Datos presionado")
+
     def accion_estadisticas(self):
-        self.lbl_estado.config(
-                    text="Botón Estadísticas presionado"
-                )
+        self.lbl_estado.config(text="Botón Estadísticas presionado")
 
     def accion_graficos(self):
-        self.lbl_estado.config(
-            text="Botón Gráficos presionado"
-        )
+        self.lbl_estado.config(text="Botón Gráficos presionado")
+
     def accion_exportar_csv(self):
-            self.lbl_estado.config(
-                    text="Botón Exportar CSV presionado"
-                )
+        self.lbl_estado.config(text="Botón Exportar CSV presionado")
+
     def accion_exportar_pdf(self):
-       self.lbl_estado.config(
-                   text="Botón Exportar PDF presionado"
-               )
-# Para poder ejecutar y probar la ventana
-#if __name__ == "__main__":
-#   root = tk.Tk()
-#   app = VentanaPrincipal(root)
-#   root.mainloop()
+        self.lbl_estado.config(text="Botón Exportar PDF presionado")
