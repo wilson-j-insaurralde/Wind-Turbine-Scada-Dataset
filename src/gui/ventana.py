@@ -87,7 +87,7 @@ class VentanaPrincipal:
         )
 
 # Para poder ejecutar y probar la ventana
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = VentanaPrincipal(root)
-    root.mainloop()
+#if __name__ == "__main__":
+#   root = tk.Tk()
+#   app = VentanaPrincipal(root)
+#   root.mainloop()
