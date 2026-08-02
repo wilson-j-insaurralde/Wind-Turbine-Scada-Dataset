@@ -3,6 +3,7 @@ import sys
 import tkinter as tk
 from tkinter import ttk
 from src.data.cargar_csv import seleccionar_y_cargar_csv
+from src.data.limpiar import limpiar_csv
 
 # Conectamos con la raíz para importar config.py
 RAIZ = Path(__file__).resolve().parent.parent.parent
@@ -17,6 +18,7 @@ class VentanaPrincipal:
         self.root = root
         self.root.title(APP_TITLE)
         self.root.geometry(APP_GEOMETRY)
+        self.df_actual = None
 
         # --- BARRA DE ESTADO (PIE DE PÁGINA) ---
         self.barra_estado = ttk.Label(
@@ -173,7 +175,22 @@ class VentanaPrincipal:
             self.barra_estado.config(text=f"⚠️ {mensaje}")
 
     def accion_limpiar(self):
-        self.lbl_estado.config(text="Botón Limpiar Datos presionado")
+        # 1. Validamos que haya un DataFrame cargado
+        if self.df_actual is None:
+            self.barra_estado.config(text="⚠️ Primero debes cargar un archivo CSV.")
+            return
+
+        # 2. Llamamos a limpiar_csv pasándole self.df_actual como argumento
+        df_limpio, mensaje = limpiar_csv(self.df_actual)
+
+        # 3. Guardamos el resultado de vuelta en self.df_actual (sin usar 'self.df_limpio')
+        if df_limpio is not None:
+            self.df_actual = df_limpio
+            self.mostrar_tabla(self.df_actual)
+            self.barra_estado.config(text=f"✨ {mensaje}")
+
+
+        
 
     def accion_estadisticas(self):
         self.lbl_estado.config(text="Botón Estadísticas presionado")
