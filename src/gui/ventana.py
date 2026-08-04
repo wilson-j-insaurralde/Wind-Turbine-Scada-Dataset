@@ -165,6 +165,7 @@ class VentanaPrincipal:
         df, mensaje = seleccionar_y_cargar_csv()
 
         if df is not None:
+            self.df_original = df.copy() 
             self.df_actual = df  # Guardamos el DataFrame en la ventana
             # Actualizamos la barra de estado de abajo
             self.barra_estado.config(
@@ -196,9 +197,12 @@ class VentanaPrincipal:
            self.lbl_estado.config(text="Atención: Primero tenés que cargar/limpiar un archivo CSV.")
            return
     
-        mensaje = calcular_resumen_estadistico(self.df_actual)
+        resumen = calcular_resumen_estadistico(self.df_actual,self.df_original)
 
-        self.lbl_estado.config(text=mensaje)
+        periodo = resumen['periodo_analizado']
+        texto_prueba = f"Inicio: {periodo['fecha_inicio']} | Fin: {periodo['fecha_fin']} | Duración: {periodo['duracion']}"
+        self.barra_estado.config(text=texto_prueba)
+
 
     def accion_graficos(self):
         self.lbl_estado.config(text="Botón Gráficos presionado")

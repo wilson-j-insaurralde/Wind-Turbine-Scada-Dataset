@@ -1,13 +1,27 @@
-from pathlib import Path
-from tkinter import filedialog
 import pandas as pd
 import numpy as np
-def calcular_periodo_analizado(df):
-    pass
+def calcular_periodo_analizado(df):    
+    fecha_inicio=df['Fecha_Hora'].min()
+    fecha_fin=df['Fecha_Hora'].max()
+    duracion= fecha_fin - fecha_inicio
+    return {
+        'fecha_inicio':fecha_inicio,
+        'fecha_fin' : fecha_fin,
+        'duracion' : duracion,
+    }
 
 
-def calcular_calidad_datos(df):
-    pass
+def calcular_calidad_datos(df,df_original):
+    total_original = len(df_original)
+    total_limpio = len(df)
+    filas_eliminadas=total_original-total_limpio
+    porcentaje=(total_limpio/total_original)*100 if total_original>0 else 0.0
+    return {
+        'total_original': total_original,
+        'total_limpio': total_limpio,
+        'filas_eliminadas': filas_eliminadas,
+        'porcentaje_calidad': round(porcentaje,2),
+    }
 
 
 def calcular_energia_total(df):
@@ -58,10 +72,10 @@ def calcular_anomalias(df):
     pass
 
 
-def calcular_resumen_estadistico(df: pd.DataFrame):
+def calcular_resumen_estadistico(df: pd.DataFrame,df_original:pd.DataFrame=None):
 
     periodo_analizado = calcular_periodo_analizado(df)
-    calidad_datos = calcular_calidad_datos(df)
+    calidad_datos = calcular_calidad_datos(df,df_original)
 
     energia_total_mwh = calcular_energia_total(df)
     metricas_potencia = calcular_metricas_potencia(df)
@@ -81,4 +95,8 @@ def calcular_resumen_estadistico(df: pd.DataFrame):
     anomalias = calcular_anomalias(df)
 
 
-    return "probando"
+    return {
+        'periodo_analizado': periodo_analizado,
+        'calidad_datos': calidad_datos,
+        
+    }
