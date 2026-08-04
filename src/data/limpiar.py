@@ -61,6 +61,8 @@ def limpiar_csv(df):
     df_limpio= corregir_anomalias_fisicas(df_limpio)
     df_limpio=eliminar_inconsistencias(df_limpio)
     df_limpio=calcular_eficiencia(df_limpio)
+    
+    df_limpio = df_limpio.reset_index(drop=True)
    
     filas_eliminadas = filas_iniciales - len(df_limpio)
     mensaje = (

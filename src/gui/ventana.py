@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import ttk
 from src.data.cargar_csv import seleccionar_y_cargar_csv
 from src.data.limpiar import limpiar_csv
+from src.analysis.estadisticas import calcular_resumen_estadistico
 
 # Conectamos con la raíz para importar config.py
 RAIZ = Path(__file__).resolve().parent.parent.parent
@@ -188,12 +189,16 @@ class VentanaPrincipal:
             self.df_actual = df_limpio
             self.mostrar_tabla(self.df_actual)
             self.barra_estado.config(text=f"✨ {mensaje}")
-
-
-        
+       
 
     def accion_estadisticas(self):
-        self.lbl_estado.config(text="Botón Estadísticas presionado")
+        if self.df_actual is None or self.df_actual.empty:
+           self.lbl_estado.config(text="Atención: Primero tenés que cargar/limpiar un archivo CSV.")
+           return
+    
+        mensaje = calcular_resumen_estadistico(self.df_actual)
+
+        self.lbl_estado.config(text=mensaje)
 
     def accion_graficos(self):
         self.lbl_estado.config(text="Botón Gráficos presionado")
