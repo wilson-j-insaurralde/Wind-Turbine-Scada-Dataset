@@ -137,8 +137,36 @@ def calcular_resumen_mensual(df,obtener_intervalo):
     
 
 
-def calcular_dia_mayor_produccion(df):
-    pass
+def calcular_dia_mayor_produccion(df, intervalo_horas):
+    df_temp = df.copy()
+    df_temp['Dia'] = df_temp['Fecha_Hora'].dt.to_period('D').astype(str)
+    resumen_dias = {}
+    for dia, grupo in df_temp.groupby('Dia'):
+        energia_mwh = (grupo['Potencia_Real'] * intervalo_horas).sum() / 1000
+        resumen_dias[dia] = {
+            'energia_mwh': energia_mwh,
+            'potencia_media_kw': grupo['Potencia_Real'].mean(),
+            'potencia_maxima_kw': grupo['Potencia_Real'].max(),
+            'viento_medio_ms': grupo['Velocidad_Viento'].mean(),
+            'viento_maximo_ms': grupo['Velocidad_Viento'].max(),
+            'cantidad_registros': len(grupo)
+        }
+    energia_maxima = 0
+    dia_maximo = None
+    for dia, datos in resumen_dias.items():
+        if datos['energia_mwh'] > energia_maxima:
+            energia_maxima = datos['energia_mwh']
+            dia_maximo = dia
+    datos = resumen_dias[dia_maximo]
+    return {
+        'dia': dia_maximo,
+        'energia_mwh': round(datos['energia_mwh'], 2),
+        'potencia_media_kw': round(datos['potencia_media_kw'], 2),
+        'potencia_maxima_kw': round(datos['potencia_maxima_kw'], 2),
+        'viento_medio_ms': round(datos['viento_medio_ms'], 2),
+        'viento_maximo_ms': round(datos['viento_maximo_ms'], 2),
+        'cantidad_registros': datos['cantidad_registros']
+    }
 
 
 def calcular_estados_viento(df):
@@ -171,9 +199,9 @@ def calcular_resumen_estadistico(df: pd.DataFrame,df_original:pd.DataFrame=None)
     eficiencia_operativa = calcular_eficiencia_operativa(df)
     horas_operativas = calcular_horas_operativas(df,obtener_intervalo)
 
-    df_resumen_mensual = calcular_resumen_mensual(df)
+    df_resumen_mensual = calcular_resumen_mensual(df,obtener_intervalo)
 
-    dia_pico_produccion = calcular_dia_mayor_produccion(df)
+    dia_pico_produccion = calcular_dia_mayor_produccion(df,obtener_intervalo)
     estados_viento = calcular_estados_viento(df)
     hora_pico_generacion = calcular_hora_pico_generacion(df)
 
@@ -191,7 +219,9 @@ def calcular_resumen_estadistico(df: pd.DataFrame,df_original:pd.DataFrame=None)
         'eficiencia_operativa':eficiencia_operativa,
         'horas_operativas':horas_operativas,
         'df_resumen_mensual':df_resumen_mensual,
-        
+        'dia_pico_produccion': dia_pico_produccion,
+
+
 
         
     }
