@@ -99,12 +99,42 @@ def calcular_eficiencia_operativa(df):
     }
 
 
-def calcular_horas_operativas(df):
-    pass
+def calcular_horas_operativas(df,obtener_intervalo):
+    # 1. Horas generando > 1 MW (1000 kW)
+    filas_mas_1mw=df[df['Potencia_Real']>1000]
+    horas_mas_1mw=len(filas_mas_1mw)*obtener_intervalo
+    # 2. Horas sin generación (Potencia <= 0 kW)
+    filas_sin_generacion=df[df['Potencia_Real']<=0]
+    horas_sin_generacion=len(filas_sin_generacion)*obtener_intervalo
+    # 3. Porcentajes sobre el tiempo total
+    horas_totales = len(df)*obtener_intervalo
+    porcentaje_mas_1mw=(horas_mas_1mw/horas_totales)*100 if horas_totales>0 else 0.0
+    porcentaje_sin_generacion=(horas_sin_generacion/horas_totales)*100 if horas_totales>0 else 0.0
+    return{
+        'horas_mas_1mw':round(horas_mas_1mw,2),
+        'porcentaje_mas_1mw':round(porcentaje_mas_1mw,2),
+        'horas_sin_generacion':round(horas_sin_generacion,2),
+        'porcentaje_sin_generacion':round(porcentaje_sin_generacion,2)
+    }
+
+       
 
 
-def calcular_resumen_mensual(df):
-    pass
+def calcular_resumen_mensual(df,obtener_intervalo):
+    df_temp=df.copy()
+    df_temp['Mes']=df_temp['Fecha_Hora'].dt.to_period('M').astype(str)
+
+    resumen={}
+    for mes,grupo in df_temp.groupby('Mes'):
+        energia_mwh = (grupo['Potencia_Real'] * obtener_intervalo).sum() / 1000
+        resumen[mes] = {
+            'energia_mwh': round(energia_mwh, 2),
+            'viento_medio_ms': round(grupo['Velocidad_Viento'].mean(), 2),
+            'potencia_media_kw': round(grupo['Potencia_Real'].mean(), 2)
+        }
+        
+    return resumen
+    
 
 
 def calcular_dia_mayor_produccion(df):
@@ -139,7 +169,7 @@ def calcular_resumen_estadistico(df: pd.DataFrame,df_original:pd.DataFrame=None)
 
     factor_capacidad = calcular_factor_capacidad(df)
     eficiencia_operativa = calcular_eficiencia_operativa(df)
-    horas_operativas = calcular_horas_operativas(df)
+    horas_operativas = calcular_horas_operativas(df,obtener_intervalo)
 
     df_resumen_mensual = calcular_resumen_mensual(df)
 
@@ -158,6 +188,10 @@ def calcular_resumen_estadistico(df: pd.DataFrame,df_original:pd.DataFrame=None)
         'metricas_potencia': metricas_potencia,
         'metricas_viento': metricas_viento,
         'factor_capacidad':factor_capacidad,
+        'eficiencia_operativa':eficiencia_operativa,
+        'horas_operativas':horas_operativas,
+        'df_resumen_mensual':df_resumen_mensual,
+        
 
-
+        
     }
