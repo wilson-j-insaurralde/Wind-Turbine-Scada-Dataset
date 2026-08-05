@@ -51,19 +51,52 @@ def calcular_energia_total(df, intervalo_horas):
 
 
 def calcular_metricas_potencia(df):
-    pass
+    potencia_media=df['Potencia_Real'].mean()
+    potencia_maxima=df['Potencia_Real'].max()
+    potencia_minima=df['Potencia_Real'].min()
+
+    return {
+        'potencia_media_kw':round(potencia_media,2),
+        'potencia_maxima_kw':round(potencia_maxima,2),
+        'potencia_minima_kw':round(potencia_minima,2),
+    }
 
 
 def calcular_metricas_viento(df):
-    pass
+    viento_medio_ms = df['Velocidad_Viento'].mean()
+    viento_maximo_ms = df['Velocidad_Viento'].max()
+    viento_minimo_ms = df['Velocidad_Viento'].min()
+    return {
+        'viento_medio_ms':round(viento_medio_ms, 2),
+        'viento_maximo_ms':round(viento_maximo_ms, 2),
+        'viento_minimo_ms':round(viento_minimo_ms, 2),
+    }
 
 
 def calcular_factor_capacidad(df):
-    pass
+    potencia_media = df['Potencia_Real'].mean()
+    potencia_maxima = df['Potencia_Real'].max()
+    if potencia_maxima>0:
+        factor_capacidad=(potencia_media/potencia_maxima)*100
+    else:
+        factor_capacidad=0.0
+    return{
+        'factor_capacidad_porcentaje':round(factor_capacidad,2),
+    }
+
 
 
 def calcular_eficiencia_operativa(df):
-    pass
+    suma_real = df['Potencia_Real'].sum()
+    suma_teorica = df['Potencia_Teorica'].sum()
+
+    if suma_teorica >0:
+        eficiencia=(suma_real/suma_teorica)*100
+    else:
+        eficiencia=0.0
+    return {
+        'eficiencia_operativa_porcentaje':round(eficiencia, 2)
+    }
 
 
 def calcular_horas_operativas(df):
@@ -122,6 +155,9 @@ def calcular_resumen_estadistico(df: pd.DataFrame,df_original:pd.DataFrame=None)
         'periodo_analizado': periodo_analizado,
         'calidad_datos': calidad_datos,
         'energia_total_mwh':energia_total_mwh,
-        
+        'metricas_potencia': metricas_potencia,
+        'metricas_viento': metricas_viento,
+        'factor_capacidad':factor_capacidad,
+
 
     }
