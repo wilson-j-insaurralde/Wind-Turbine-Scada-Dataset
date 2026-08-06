@@ -169,12 +169,54 @@ def calcular_dia_mayor_produccion(df, intervalo_horas):
     }
 
 
-def calcular_estados_viento(df):
-    pass
+def calcular_estados_viento(df,obtener_intervalo):
+    filas_calma=df[df['Velocidad_Viento']< 3.0]
+    filas_operativas = df[(df['Velocidad_Viento'] >= 3.0) & (df['Velocidad_Viento'] <= 25.0)]
+    filas_criticas = df[df['Velocidad_Viento'] > 25.0]
+
+    horas_calma = len(filas_calma) * obtener_intervalo
+    horas_operativas=len(filas_operativas)*obtener_intervalo
+    horas_criticas=len(filas_criticas)*obtener_intervalo
+    horas_totales = len(df) * obtener_intervalo
+    porcentaje_calma = (horas_calma / horas_totales) * 100 if horas_totales > 0 else 0.0
+    porcentaje_operativo = (horas_operativas / horas_totales) * 100 if horas_totales > 0 else 0.0
+    porcentaje_critico = (horas_criticas / horas_totales) * 100 if horas_totales > 0 else 0.0
+    return{
+        'horas_calma': round(horas_calma, 2),
+        'porcentaje_calma': round(porcentaje_calma, 2),
+        'horas_operativas': round(horas_operativas, 2),
+        'porcentaje_operativo': round(porcentaje_operativo, 2),
+        'horas_criticas': round(horas_criticas, 2),
+        'porcentaje_critico': round(porcentaje_critico, 2),
+    }
 
 
 def calcular_hora_pico_generacion(df):
-    pass
+    df_temp = df.copy()
+    df_temp['Hora'] = df_temp['Fecha_Hora'].dt.hour
+    
+    resumen_horas = {}
+    for hora, grupo in df_temp.groupby('Hora'):
+        resumen_horas[hora] = {
+            'potencia_media_kw': grupo['Potencia_Real'].mean(),
+            'viento_medio_ms': grupo['Velocidad_Viento'].mean()
+        }
+        
+    hora_pico = None
+    potencia_maxima = -1
+
+    for hora, datos in resumen_horas.items():
+        if datos['potencia_media_kw'] > potencia_maxima:
+            potencia_maxima = datos['potencia_media_kw']
+            hora_pico = hora
+
+    datos_pico = resumen_horas[hora_pico]
+
+    return {
+        'hora_pico': hora_pico,
+        'potencia_media_kw': round(datos_pico['potencia_media_kw'], 2),
+        'viento_medio_ms': round(datos_pico['viento_medio_ms'], 2)
+    }
 
 
 def calcular_correlaciones(df):
@@ -202,7 +244,7 @@ def calcular_resumen_estadistico(df: pd.DataFrame,df_original:pd.DataFrame=None)
     df_resumen_mensual = calcular_resumen_mensual(df,obtener_intervalo)
 
     dia_pico_produccion = calcular_dia_mayor_produccion(df,obtener_intervalo)
-    estados_viento = calcular_estados_viento(df)
+    estados_viento = calcular_estados_viento(df,obtener_intervalo)
     hora_pico_generacion = calcular_hora_pico_generacion(df)
 
     correlaciones = calcular_correlaciones(df)
@@ -220,6 +262,8 @@ def calcular_resumen_estadistico(df: pd.DataFrame,df_original:pd.DataFrame=None)
         'horas_operativas':horas_operativas,
         'df_resumen_mensual':df_resumen_mensual,
         'dia_pico_produccion': dia_pico_produccion,
+        'estados_viento': estados_viento,
+        'hora_pico_generacion':hora_pico_generacion
 
 
 
