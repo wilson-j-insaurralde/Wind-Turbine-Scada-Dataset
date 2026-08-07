@@ -5,6 +5,14 @@ from tkinter import ttk
 from src.data.cargar_csv import seleccionar_y_cargar_csv
 from src.data.limpiar import limpiar_csv
 from src.analysis.estadisticas import calcular_resumen_estadistico
+from src.gui.componentes.tabs_estadisticas import (
+    aplicar_estilo_dashboard,
+    construir_tab_dashboard,
+    construir_tab_diario,
+    construir_tab_mensual,
+    construir_tab_viento,
+)
+from src.gui.componentes.panel_lateral import crear_panel_lateral
 
 # Conectamos con la raíz para importar config.py
 RAIZ = Path(__file__).resolve().parent.parent.parent
@@ -33,80 +41,7 @@ class VentanaPrincipal:
         self.barra_estado.pack(side="bottom", fill="x")
 
         # --- PANEL LATERAL (IZQUIERDA) ---
-        self.panel_lateral = ttk.Frame(self.root, padding=10)
-        self.panel_lateral.pack(side="left", fill="y")
-
-        # Título
-        ttk.Label(
-            self.panel_lateral, text="Panel de Control", font=("Arial", 12, "bold")
-        ).pack(pady=10)
-
-        # --- BOTONES DEL PANEL DE CONTROL ---
-        # 1. Cargar CSV
-        self.btn_cargar = tk.Button(
-            self.panel_lateral,
-            text="📂 Abrir CSV",
-            command=self.accion_cargar,
-            width=18,
-            anchor="w",
-            padx=10,
-        )
-        self.btn_cargar.pack(pady=5, fill="x")
-
-        # 2. Limpiar Datos
-        self.btn_limpiar = tk.Button(
-            self.panel_lateral,
-            text="🧹 Limpiar Datos",
-            command=self.accion_limpiar,
-            width=18,
-            anchor="w",
-            padx=10,
-        )
-        self.btn_limpiar.pack(pady=5, fill="x")
-
-        # 3. Estadísticas
-        self.btn_estadisticas = tk.Button(
-            self.panel_lateral,
-            text="📊 Estadísticas",
-            command=self.accion_estadisticas,
-            width=18,
-            anchor="w",
-            padx=10,
-        )
-        self.btn_estadisticas.pack(pady=5, fill="x")
-
-        # 4. Gráficos
-        self.btn_graficos = tk.Button(
-            self.panel_lateral,
-            text="📈 Gráficos",
-            command=self.accion_graficos,
-            width=18,
-            anchor="w",
-            padx=10,
-        )
-        self.btn_graficos.pack(pady=5, fill="x")
-
-        # 5. Exportar CSV
-        self.btn_exportar_csv = tk.Button(
-            self.panel_lateral,
-            text="💾 Exportar CSV",
-            command=self.accion_exportar_csv,
-            width=18,
-            anchor="w",
-            padx=10,
-        )
-        self.btn_exportar_csv.pack(pady=5, fill="x")
-
-        # 6. Exportar PDF
-        self.btn_exportar_pdf = tk.Button(
-            self.panel_lateral,
-            text="📄 Exportar PDF",
-            command=self.accion_exportar_pdf,
-            width=18,
-            anchor="w",
-            padx=10,
-        )
-        self.btn_exportar_pdf.pack(pady=5, fill="x")
+        self.panel_lateral = crear_panel_lateral(self)
 
         # --- ÁREA PRINCIPAL (DERECHA) ---
         self.area_principal = ttk.Frame(self.root, padding=10, relief="sunken")
@@ -193,17 +128,49 @@ class VentanaPrincipal:
        
 
     def accion_estadisticas(self):
+        # 1. Validamos que haya datos cargados
         if self.df_actual is None or self.df_actual.empty:
-           self.lbl_estado.config(text="Atención: Primero tenés que cargar/limpiar un archivo CSV.")
-           return
-    
-        resumen = calcular_resumen_estadistico(self.df_actual,self.df_original)
+            self.barra_estado.config(
+                text="⚠️ Atención: Primero tenés que cargar/limpiar un archivo CSV."
+            )
+            return
 
-        periodo = resumen['periodo_analizado']
-        texto_prueba = f"Inicio: {periodo['fecha_inicio']} | Fin: {periodo['fecha_fin']} | Duración: {periodo['duracion']}"
-        self.barra_estado.config(text=texto_prueba)
+        # 2. Calculamos el resumen
+        df_orig = getattr(self, "df_original", self.df_actual)
+        resumen = calcular_resumen_estadistico(self.df_actual, df_orig)
 
+        # 3. Limpiamos el área principal
+        for widget in self.area_principal.winfo_children():
+            widget.destroy()
 
+        # 4. Aplicamos estilo e iniciamos las Pestañas
+        aplicar_estilo_dashboard()
+        notebook = ttk.Notebook(self.area_principal)
+        notebook.pack(fill="both", expand=True)
+
+        # -- Pestaña 1: Dashboard Ejecutivo --
+        tab1 = ttk.Frame(notebook, padding=15)
+        notebook.add(tab1, text="📊 Dashboard Ejecutivo")
+        construir_tab_dashboard(tab1, resumen)
+
+        # -- Pestaña 2: Viento y Calidad --
+        tab2 = ttk.Frame(notebook, padding=15)
+        notebook.add(tab2, text="🌬️ Viento y Calidad de Datos")
+        construir_tab_viento(tab2, resumen)
+
+        # -- Pestaña 3: Reporte Mensual --
+        tab3 = ttk.Frame(notebook, padding=10)
+        notebook.add(tab3, text="🗓️ Reporte Mensual")
+        construir_tab_mensual(tab3, resumen)
+
+        # -- Pestaña 4: Generación Diaria --
+        tab4 = ttk.Frame(notebook, padding=10)
+        notebook.add(tab4, text="📅 Generación Diaria")
+        construir_tab_diario(tab4, resumen)
+
+        self.barra_estado.config(
+            text="✅ Dashboard estadístico generado con éxito."
+        )
     def accion_graficos(self):
         self.lbl_estado.config(text="Botón Gráficos presionado")
 
@@ -211,4 +178,4 @@ class VentanaPrincipal:
         self.lbl_estado.config(text="Botón Exportar CSV presionado")
 
     def accion_exportar_pdf(self):
-        self.lbl_estado.config(text="Botón Exportar PDF presionado")
+        self.lbl_estado.config(text="Botón Exportar PDF presionado") 

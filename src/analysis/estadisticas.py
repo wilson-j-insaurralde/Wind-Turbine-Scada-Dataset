@@ -44,8 +44,8 @@ def calcular_energia_total(df, intervalo_horas):
     return {
         'energia_total_kwh': round(total_kwh, 2),
         'energia_total_mwh': round(total_kwh / 1000, 2),
-        'energia_diaria': energia_diaria,    # Ej: {'2026-08-01': 450.2, ...}
-        'energia_mensual': energia_mensual   # Ej: {'2026-08': 12500.5, ...}
+        'energia_diaria': energia_diaria,    
+        'energia_mensual': energia_mensual   
     }
 
 
@@ -220,15 +220,38 @@ def calcular_hora_pico_generacion(df):
 
 
 def calcular_correlaciones(df):
-    pass
+    matriz_corr = df[
+        ['Velocidad_Viento', 'Potencia_Real', 'Potencia_Teorica']
+    ].corr()
+    corr_viento_real = matriz_corr.loc['Velocidad_Viento', 'Potencia_Real']
+    corr_viento_teorica = matriz_corr.loc[
+        'Velocidad_Viento', 'Potencia_Teorica'
+    ]
+    corr_real_teorica = matriz_corr.loc['Potencia_Real', 'Potencia_Teorica']
+    return {
+        'viento_vs_potencia_real': round(corr_viento_real, 4),
+        'viento_vs_potencia_teorica': round(corr_viento_teorica, 4),
+        'potencia_real_vs_teorica': round(corr_real_teorica, 4),
+    }
 
 
 def calcular_anomalias(df):
-    pass
+    anomalias_viento_sin_potencia = df[
+        (df['Velocidad_Viento'] >= 3.0) & (df['Potencia_Real'] <= 0)
+    ]
+    anomalias_sobreproduccion = df[
+        df['Potencia_Real'] > (df['Potencia_Teorica'] * 1.15)
+    ]
+
+    return {
+        'cantidad_viento_sin_potencia': len(anomalias_viento_sin_potencia),
+        'cantidad_sobreproduccion': len(anomalias_sobreproduccion),
+    }
 
 
 def calcular_resumen_estadistico(df: pd.DataFrame,df_original:pd.DataFrame=None):
-
+    if df_original is None:
+        df_original = df
     obtener_intervalo = obtener_intervalo_horas(df)
     periodo_analizado = calcular_periodo_analizado(df)
     calidad_datos = calcular_calidad_datos(df,df_original)
@@ -263,9 +286,7 @@ def calcular_resumen_estadistico(df: pd.DataFrame,df_original:pd.DataFrame=None)
         'df_resumen_mensual':df_resumen_mensual,
         'dia_pico_produccion': dia_pico_produccion,
         'estados_viento': estados_viento,
-        'hora_pico_generacion':hora_pico_generacion
-
-
-
-        
+        'hora_pico_generacion':hora_pico_generacion,
+        'correlaciones' : correlaciones,
+        'anomalias':anomalias,        
     }
