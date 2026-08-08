@@ -13,6 +13,7 @@ from src.gui.componentes.tabs_estadisticas import (
     construir_tab_viento,
 )
 from src.gui.componentes.panel_lateral import crear_panel_lateral
+from src.gui.componentes.tabs_graficos import construir_tab_graficos
 
 # Conectamos con la raíz para importar config.py
 RAIZ = Path(__file__).resolve().parent.parent.parent
@@ -171,8 +172,25 @@ class VentanaPrincipal:
         self.barra_estado.config(
             text="✅ Dashboard estadístico generado con éxito."
         )
+
+
     def accion_graficos(self):
-        self.lbl_estado.config(text="Botón Gráficos presionado")
+        if self.df_actual is None or self.df_actual.empty:
+            self.barra_estado.config(
+                text="⚠️ Atención: Primero tenés que cargar/limpiar un archivo CSV para ver los gráficos."
+            )
+            return
+
+        # Limpiamos el área principal
+        for widget in self.area_principal.winfo_children():
+            widget.destroy()
+
+        # Construimos el panel completo de 4 gráficos
+        construir_tab_graficos(self.area_principal, self.df_actual)
+
+        self.barra_estado.config(
+            text="✅ Panel de gráficos de potencia, viento y eficiencia generado con éxito."
+        )
 
     def accion_exportar_csv(self):
         self.lbl_estado.config(text="Botón Exportar CSV presionado")
