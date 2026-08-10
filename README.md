@@ -140,4 +140,3 @@ dataset\_info.txt
 
 ---
 
-**Proyecto de Ciencia de Datos y Análisis de Datos aplicado a sistemas SCADA de generación eólica.**
