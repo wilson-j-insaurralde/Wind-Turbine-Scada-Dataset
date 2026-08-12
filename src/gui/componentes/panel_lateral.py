@@ -22,15 +22,13 @@ def crear_panel_lateral(ventana):
         ("📄 Exportar PDF", ventana.accion_exportar_pdf),
     ]
 
-    # Iteramos para crear y empaquetar los botones sin repetir código
+    # Usamos ttk.Button para mantener consistencia visual y de eventos
     for texto, comando in botones:
-        btn = tk.Button(
+        btn = ttk.Button(
             panel,
             text=texto,
             command=comando,
-            width=18,
-            anchor="w",
-            padx=10,
+            width=20,
         )
         btn.pack(pady=5, fill="x")
 

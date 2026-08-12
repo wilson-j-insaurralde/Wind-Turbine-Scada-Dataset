@@ -14,6 +14,9 @@ from src.gui.componentes.tabs_estadisticas import (
 )
 from src.gui.componentes.panel_lateral import crear_panel_lateral
 from src.gui.componentes.tabs_graficos import construir_tab_graficos
+from src.utils.reportes import generar_pdf_scada
+from tkinter import filedialog, messagebox
+import os
 
 # Conectamos con la raíz para importar config.py
 RAIZ = Path(__file__).resolve().parent.parent.parent
@@ -193,7 +196,82 @@ class VentanaPrincipal:
         )
 
     def accion_exportar_csv(self):
-        self.lbl_estado.config(text="Botón Exportar CSV presionado")
+        # 1. Validar que tengamos datos para exportar
+        if self.df_actual is None or self.df_actual.empty:
+            messagebox.showwarning(
+                "Atención",
+                "Primero debés cargar y/o limpiar un archivo CSV para poder exportar."
+            )
+            self.barra_estado.config(
+                text="⚠️ Atención: No hay datos cargados para exportar."
+            )
+            return
+
+        # 2. Abrir cuadro de diálogo para seleccionar ubicación y nombre del archivo
+        ruta_guardado = filedialog.asksaveasfilename(
+            defaultextension=".csv",
+            filetypes=[("Archivos CSV", "*.csv"), ("Todos los archivos", "*.*")],
+            title="Exportar Datos Limpios a CSV",
+            initialfile="datos_turbina_procesados.csv"
+        )
+
+        # 3. Si el usuario seleccionó una ruta (no apretó cancelar)
+        if ruta_guardado:
+            try:
+                # Exportamos a CSV sin guardar la columna de índice automático de pandas
+                self.df_actual.to_csv(ruta_guardado, index=False)
+
+                messagebox.showinfo(
+                    "¡Éxito!",
+                    f"El archivo se exportó correctamente en:\n{ruta_guardado}"
+                )
+                self.barra_estado.config(
+                    text=f"✅ Datos exportados con éxito: {len(self.df_actual)} filas guardadas."
+                )
+
+            except Exception as e:
+                messagebox.showerror(
+                    "Error",
+                    f"Ocurrió un error al intentar guardar el archivo CSV:\n{str(e)}"
+                )
 
     def accion_exportar_pdf(self):
-        self.lbl_estado.config(text="Botón Exportar PDF presionado") 
+        # 1. Validar que haya datos cargados
+        if self.df_actual is None or self.df_actual.empty:
+            self.barra_estado.config(
+                text="⚠️ Atención: Primero tenés que cargar/limpiar un archivo CSV."
+            )
+            return
+
+        # 2. Elegir ruta para guardar el PDF
+        ruta_guardado = filedialog.asksaveasfilename(
+            defaultextension=".pdf",
+            filetypes=[("Archivos PDF", "*.pdf")],
+            title="Guardar Reporte PDF",
+        )
+
+        if ruta_guardado:
+            try:
+                temp_img = "temp_grafico.png"
+                
+                # Guardar el panel de gráficos actual si existe en la pantalla
+                import matplotlib.pyplot as plt
+                if plt.get_fignums():
+                    plt.savefig(temp_img, bbox_inches="tight", dpi=150)
+
+                # 3. Calcular el resumen estadístico con TODAS tus funciones
+                df_orig = getattr(self, "df_original", self.df_actual)
+                resumen_completo = calcular_resumen_estadistico(self.df_actual, df_orig)
+
+                # 4. Generar el PDF profesional pasándole el diccionario completo
+                generar_pdf_scada(ruta_guardado, resumen_completo, temp_img)
+
+                # Limpiar la imagen temporal
+                if os.path.exists(temp_img):
+                    os.remove(temp_img)
+
+                messagebox.showinfo("¡Éxito!", f"El reporte PDF completo se generó con éxito en:\n{ruta_guardado}")
+                self.barra_estado.config(text="✅ Reporte PDF exportado con éxito.")
+
+            except Exception as e:
+                messagebox.showerror("Error", f"No se pudo generar el PDF: {e}")
