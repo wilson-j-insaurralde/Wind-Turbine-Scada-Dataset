@@ -1,64 +1,55 @@
-# **💨 Wind Turbine SCADA Performance Analysis**
+# 💨 Wind Turbine SCADA Performance Analysis
 
 Proyecto de Análisis de Datos y visualización utilizando información SCADA de una turbina eólica.  
 El proyecto incluye el proceso completo de carga, limpieza, transformación (ETL), análisis exploratorio (EDA), cálculo de indicadores (KPIs) y una aplicación modular con interfaz gráfica (Tkinter) para la visualización de datos. Además, los datos procesados quedan preparados para su análisis en Power BI.
 
-## ---
+---
 
-**📂 Estructura del Proyecto**
+### 📂 Estructura del Proyecto
 
-WIND\_TURBINE\_SCADA\_DATASET/  
-├── dashboard/  
-│   └── images/          \# Capturas de pantalla para el README y presentaciones  
+```text
+WIND_TURBINE_SCADA_DATASET/  
 ├── data/  
-│   ├── raw/             \# Archivos CSV SCADA originales (intocables)  
-│   ├── processed/       \# Datos procesados (Parquet/CSV)  
-│   └── database/        \# Base de datos local (SQLite)  
-├── notebooks/           \# Exploración inicial (EDA) en Jupyter  
+│   ├── raw/             # Archivos CSV SCADA originales (T1.csv)
+│   └── processed/       # Datos procesados (datos_turbina_procesados.csv)
+├── notebooks/           # Análisis exploratorio (EDA)
+│   └── turbina_scada_analisis.ipynb
 ├── src/  
-│   ├── main.py          \# Punto de entrada de la aplicación  
-│   ├── config.py        \# Rutas dinámicas y constantes del sistema  
-│   ├── gui/             \# Capa de Interfaz Gráfica (Tkinter)  
-│   │   ├── \_\_init\_\_.py  
-│   │   ├── ventana.py  
-│   │   ├── menu.py  
-│   │   ├── toolbar.py  
-│   │   ├── panel.py  
-│   │   ├── tablas.py  
-│   │   ├── graficos.py  
-│   │   └── dialogs.py  
-│   ├── data/            \# Capa de Ingesta y ETL  
-│   │   ├── \_\_init\_\_.py  
-│   │   ├── cargar\_csv.py  
-│   │   ├── limpiar.py  
-│   │   └── transformar.py  
-│   ├── analysis/        \# Capa de Cálculo y Análisis SCADA  
-│   │   ├── \_\_init\_\_.py  
-│   │   ├── estadisticas.py  
+│   ├── main.py          # Punto de entrada de la aplicación  
+│   ├── config.py        # Rutas dinámicas y constantes del sistema  
+│   ├── analysis/        # Módulos de Cálculo y Análisis SCADA  
 │   │   ├── correlacion.py  
+│   │   ├── estadisticas.py  
 │   │   └── tendencias.py  
-│   └── utils/           \# Helpers, formateadores y logs  
-│       ├── \_\_init\_\_.py  
-│       └── helpers.py  
-├── dataset\_info.txt     \# Descripción y metadatos del dataset  
-├── requirements.txt     \# Dependencias del proyecto  
-└── README.md
+│   ├── data/            # Módulos de Ingesta y Limpieza  
+│   │   ├── cargar_csv.py  
+│   │   └── limpiar.py  
+│   ├── gui/             # Interfaz Gráfica (Tkinter)  
+│   │   ├── componentes/  
+│   │   └── ventana.py  
+│   └── utils/           # Generación de Reportes PDF y Helpers  
+│       └── reportes.py  
+├── dataset_info.txt     # Descripción y metadatos del dataset  
+├── requirements.txt     # Dependencias del proyecto  
+└── README.md 
+```
 
-## ---
+---
 
-**🛠️ Tecnologías utilizadas**
+###🛠️ Tecnologías utilizadas
 
 > * Python  
 > * Pandas  
 > * NumPy  
 > * Matplotlib  
 > * Tkinter  
-> * Jupyter Notebook  
+> * Jupyter Notebook
+> * ReportLab (Generación de PDF)
 > * Power BI (Próximamente)
 
-## ---
+---
 
-**📊 Indicadores Principales (KPIs)**
+###📊 Indicadores Principales (KPIs)
 
 | Indicador | Valor   |
 | :---- | ----- |
@@ -68,9 +59,9 @@ WIND\_TURBINE\_SCADA\_DATASET/
 | Potencia teórica promedio | 1.492,18 kW |
 | Eficiencia operativa promedio | 68,68 % |
 
-## ---
+---
 
-**📈 Contenido del Proyecto**
+###📈 Contenido del Proyecto 
 
 > * Carga del conjunto de datos.  
 > * Limpieza y transformación de datos (ETL).  
@@ -78,20 +69,21 @@ WIND\_TURBINE\_SCADA\_DATASET/
 > * Cálculo de indicadores operativos (KPIs).  
 > * Análisis exploratorio de datos (EDA).  
 > * Visualización de variables y tendencias mediante interfaz gráfica (Tkinter).  
+> * Exportación automática de reportes en PDF.
 > * Exportación del conjunto de datos procesado para Power BI.
 
-## ---
+---
 
-**🔍 Principales hallazgos**
+###🔍 Principales hallazgos 
 
 > * La producción de energía presenta un comportamiento estacional claramente definido.  
 > * La potencia real sigue, en términos generales, la tendencia de la curva de potencia teórica.  
 > * Los meses con mayor velocidad promedio del viento registran una mayor generación de energía.  
 > * El conjunto de datos procesado queda preparado para su análisis mediante Power BI.
 
-## ---
+---
 
-**⚠️ Limitaciones del análisis**
+###⚠️ Limitaciones del análisis 
 
 Se detectaron registros con eficiencias superiores al 100 %, principalmente a bajas velocidades del viento (≈3 m/s).  
 Estos valores no indican que la turbina supere sus límites físicos de eficiencia. Lo más probable es que estén asociados a:
@@ -103,9 +95,12 @@ Estos valores no indican que la turbina supere sus límites físicos de eficienc
 
 Por ello, estos registros deben interpretarse como valores atípicos propios de este tipo de sistemas y no como un aumento real del rendimiento de la turbina.
 
-## ---
+---
 
-**📷 Visualizaciones**
+###📷 Visualizaciones 
+
+#### 🎬 Demostración de la Aplicación
+![Demo de la aplicación](turbine-tkinter-gif.gif)
 
 ### **Dashboard 1**
 
@@ -115,9 +110,9 @@ Por ello, estos registros deben interpretarse como valores atípicos propios de 
 
 ![Dashboard 2](dashboard/images/02_dashboard_graficos.png)
 
-## ---
+---
 
-**📁 Organización de los datos**
+###📁 Organización de los datos 
 
 El archivo original del dataset se encuentra en:  
 data/raw/  
@@ -126,9 +121,9 @@ data/processed/
 La información sobre el origen del dataset y la descripción de las variables se encuentra en:  
 dataset\_info.txt
 
-## ---
+---
 
-**🚀 Próximas mejoras**
+###🚀 Próximas mejoras
 
 > * Dashboard interactivo en Power BI.  
 > * Aplicación de escritorio desarrollada con Tkinter.  
